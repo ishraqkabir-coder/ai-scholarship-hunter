@@ -10,25 +10,25 @@ exports.handler = async function(event) {
   var prompt = body.prompt;
   if(!prompt){ return {statusCode:400, body:'Missing prompt'}; }
 
-  var apiKey = process.env.OR_API_KEY;
-  var model  = process.env.OR_MODEL || 'perplexity/sonar';
-
-  if(!apiKey){ return {statusCode:500, body:'API key not configured'}; }
+  var apiKey = process.env.GROQ_API_KEY;
+  if(!apiKey){ return {statusCode:500, body:JSON.stringify({error:'API key not configured'})}; }
 
   try{
-    var response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    var response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': 'Bearer ' + apiKey,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://aischolarshiphunter.netlify.app',
-        'X-Title': 'AI Scholarship Hunter'
+        'Groq-Model-Version': 'latest'
       },
       body: JSON.stringify({
-        model: model,
-        messages: [{role:'user', content:prompt}],
+        model: 'groq/compound',
+        messages: [{role:'user', content: prompt}],
         temperature: 0.7,
-        max_tokens: 4096
+        max_tokens: 4096,
+        compound_custom: {
+          tools: { enabled_tools: ['web_search'] }
+        }
       })
     });
 
@@ -36,7 +36,7 @@ exports.handler = async function(event) {
       var errText = await response.text();
       return {
         statusCode: response.status,
-        body: JSON.stringify({error: 'OpenRouter error: ' + response.status, detail: errText})
+        body: JSON.stringify({error: 'Groq error: ' + response.status, detail: errText})
       };
     }
 
