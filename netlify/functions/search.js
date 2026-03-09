@@ -1,3 +1,31 @@
+const https = require('https');
+
+function httpsPost(url, headers, bodyData) {
+  return new Promise(function(resolve, reject) {
+    var urlObj = new URL(url);
+    var bodyStr = JSON.stringify(bodyData);
+    var options = {
+      hostname: urlObj.hostname,
+      path: urlObj.pathname,
+      method: 'POST',
+      headers: Object.assign({
+        'Content-Length': Buffer.byteLength(bodyStr)
+      }, headers)
+    };
+    var req = https.request(options, function(res) {
+      var data = '';
+      res.on('data', function(chunk){ data += chunk; });
+      res.on('end', function(){
+        resolve({ status: res.statusCode, body: data });
+      });
+    });
+    req.on('error', reject);
+    req.setTimeout(60000, function(){ req.destroy(new Error('Request timeout')); });
+    req.write(bodyStr);
+    req.end();
+  });
+}
+
 exports.handler = async function(event) {
   if(event.httpMethod !== 'POST'){
     return {statusCode:405, body:'Method Not Allowed'};
@@ -14,14 +42,14 @@ exports.handler = async function(event) {
   if(!apiKey){ return {statusCode:500, body:JSON.stringify({error:'API key not configured'})}; }
 
   try{
-    var response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
+    var result = await httpsPost(
+      'https://api.groq.com/openai/v1/chat/completions',
+      {
         'Authorization': 'Bearer ' + apiKey,
         'Content-Type': 'application/json',
         'Groq-Model-Version': 'latest'
       },
-      body: JSON.stringify({
+      {
         model: 'groq/compound',
         messages: [{role:'user', content: prompt}],
         temperature: 0.7,
@@ -29,22 +57,20 @@ exports.handler = async function(event) {
         compound_custom: {
           tools: { enabled_tools: ['web_search'] }
         }
-      })
-    });
+      }
+    );
 
-    if(!response.ok){
-      var errText = await response.text();
+    if(result.status !== 200){
       return {
-        statusCode: response.status,
-        body: JSON.stringify({error: 'Groq error: ' + response.status, detail: errText})
+        statusCode: result.status,
+        body: JSON.stringify({error: 'Groq error: ' + result.status, detail: result.body})
       };
     }
 
-    var data = await response.json();
     return {
       statusCode: 200,
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(data)
+      body: result.body
     };
   } catch(e){
     return {statusCode:500, body: JSON.stringify({error: e.message})};
