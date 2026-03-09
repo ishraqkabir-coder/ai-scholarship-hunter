@@ -1,12 +1,11 @@
 const https = require('https');
 
-function httpsPost(url, headers, bodyData) {
+function httpsPost(hostname, path, headers, bodyData) {
   return new Promise(function(resolve, reject) {
-    var urlObj = new URL(url);
     var bodyStr = JSON.stringify(bodyData);
     var options = {
-      hostname: urlObj.hostname,
-      path: urlObj.pathname,
+      hostname: hostname,
+      path: path,
       method: 'POST',
       headers: Object.assign({ 'Content-Length': Buffer.byteLength(bodyStr) }, headers)
     };
@@ -34,37 +33,62 @@ exports.handler = async function(event) {
   var prompt = body.prompt;
   if(!prompt) return { statusCode: 400, body: JSON.stringify({error: 'Missing prompt'}) };
 
-  var apiKey = process.env.TOGETHER_API_KEY;
-  if(!apiKey) return { statusCode: 500, body: JSON.stringify({error: 'API key not configured'}) };
+  var tavilyKey = process.env.TAVILY_API_KEY;
+  var orKey     = process.env.OR_API_KEY;
+  if(!tavilyKey || !orKey) return { statusCode: 500, body: JSON.stringify({error: 'API keys not configured'}) };
 
   try{
-    var result = await httpsPost(
-      'https://api.together.xyz/v1/chat/completions',
+    // Step 1: Tavily web search
+    var tavilyRes = await httpsPost(
+      'api.tavily.com',
+      '/search',
+      { 'Authorization': 'Bearer ' + tavilyKey, 'Content-Type': 'application/json' },
       {
-        'Authorization': 'Bearer ' + apiKey,
-        'Content-Type': 'application/json'
+        query: 'open scholarships 2025 2026 international students application',
+        search_depth: 'advanced',
+        max_results: 8,
+        include_answer: false
+      }
+    );
+
+    var tavilyData;
+    try{ tavilyData = JSON.parse(tavilyRes.body); }
+    catch(e){ tavilyData = { results: [] }; }
+
+    var searchContext = (tavilyData.results || []).map(function(r, i){
+      return (i+1) + '. ' + (r.title||'') + '\n' + (r.url||'') + '\n' + (r.content||'').slice(0, 400);
+    }).join('\n\n');
+
+    // Step 2: Gemma 3 27B analyze and match
+    var fullPrompt = prompt + '\n\n=== REAL-TIME WEB SEARCH RESULTS ===\n' + searchContext + '\n\nUse these search results to find real matching scholarships with actual URLs.';
+
+    var llmRes = await httpsPost(
+      'openrouter.ai',
+      '/api/v1/chat/completions',
+      {
+        'Authorization': 'Bearer ' + orKey,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://aischolarshiphunter.netlify.app',
+        'X-Title': 'AI Scholarship Hunter'
       },
       {
-        model: 'meta-llama/Llama-3.3-70B-Instruct-Turbo',
-        messages: [{ role: 'user', content: prompt }],
+        model: 'google/gemma-3-27b-it:free',
+        messages: [{ role: 'user', content: fullPrompt }],
         temperature: 0.7,
         max_tokens: 4096
       }
     );
 
-    if(result.status !== 200){
-      return {
-        statusCode: result.status,
-        body: JSON.stringify({ error: 'Together AI error: ' + result.status, detail: result.body })
-      };
+    if(llmRes.status !== 200){
+      return { statusCode: llmRes.status, body: JSON.stringify({error: 'LLM error: ' + llmRes.status, detail: llmRes.body}) };
     }
 
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: result.body
+      body: llmRes.body
     };
   } catch(e){
-    return { statusCode: 500, body: JSON.stringify({ error: e.message }) };
+    return { statusCode: 500, body: JSON.stringify({error: e.message}) };
   }
 };
