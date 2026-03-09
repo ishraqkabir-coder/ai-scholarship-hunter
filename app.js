@@ -1,5 +1,5 @@
-var OR_API_KEY  = "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";
-var OR_MODEL    = "perplexity/sonar";
+var SEARCH_ENDPOINT = '/.netlify/functions/search';
+var DR_ENDPOINT     = '/.netlify/functions/deepresearch';
 var CACHE_KEY   = "sch_hunter_v7";
 var lastData    = null;
 var curStep     = 1;
@@ -253,15 +253,10 @@ async function fetchWithRetry(prompt, attempts){
     try{
       var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
       var timeoutId = controller ? setTimeout(function(){controller.abort();}, 55000) : null;
-      var res = await fetch('https://openrouter.ai/api/v1/chat/completions',{
-        method:'POST',
-        headers:{
-          'Authorization':'Bearer '+OR_API_KEY,
-          'Content-Type':'application/json',
-          'HTTP-Referer':'https://aischolarshiphunter.app',
-          'X-Title':'AI Scholarship Hunter'
-        },
-        body:JSON.stringify({model:OR_MODEL,messages:[{role:'user',content:prompt}],temperature:0.7,max_tokens:4096}),
+      var res = await fetch(SEARCH_ENDPOINT, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({prompt: prompt}),
         signal: controller ? controller.signal : undefined
       });
       if(timeoutId) clearTimeout(timeoutId);
@@ -506,10 +501,10 @@ function drOpen(idx){
     '{"scholarshipName":"","whyForYou":"3-5 sentences","minRequirements":[{"label":"","value":""}],"requiredDocuments":[{"name":"","note":""}],"pros":[""],"cons":[""],"pastRecipients":{"anyFromCountry":true,"stories":[{"name":"","year":"","profile":"","strategy":"","source":""}]},"youtubeVideos":[{"title":"descriptive title","searchQuery":"exact youtube search terms","channel":"likely channel name","relevance":"why helpful"}]}'
   ].filter(Boolean).join('\n');
 
-  fetch('https://openrouter.ai/api/v1/chat/completions',{
+  fetch(DR_ENDPOINT, {
     method:'POST',
-    headers:{'Authorization':'Bearer '+OR_API_KEY,'Content-Type':'application/json','HTTP-Referer':'https://aischolarshiphunter.app','X-Title':'AI Scholarship Hunter'},
-    body:JSON.stringify({model:OR_MODEL,messages:[{role:'user',content:plines}],temperature:0.5,max_tokens:5000})
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({prompt:plines})
   })
   .then(function(r){return r.json();})
   .then(function(data){
