@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Scholarship Hunter</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *{font-family:'Nunito',sans-serif;box-sizing:border-box;}
+    body{min-height:100vh;overflow-x:hidden;}
+    .bg-full{position:fixed;inset:0;z-index:0;background:linear-gradient(160deg,#c8e6fa 0%,#daeffe 40%,#eaf4ff 70%,#f4faff 100%);}
+    .bg-full::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(160,210,245,0.45) 1.2px,transparent 1.2px);background-size:34px 34px;}
+    .blob{position:fixed;border-radius:50%;filter:blur(75px);opacity:.35;pointer-events:none;z-index:0;animation:blobFloat 9s ease-in-out infinite alternate;}
+    @keyframes blobFloat{0%{transform:translateY(0) scale(1);}100%{transform:translateY(-28px) scale(1.06);}}
+    .b1{width:520px;height:520px;background:#94d0f7;top:-120px;left:-160px;}
+    .b2{width:420px;height:420px;background:#a8dafa;bottom:-100px;right:-120px;animation-delay:3s;}
+    .b3{width:300px;height:300px;background:#b8e2fb;top:38%;left:28%;animation-delay:5.5s;}
+    nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(190,220,248,.5);}
+    .logo-badge{background:linear-gradient(135deg,#2474c8,#3a9de8);border-radius:12px;padding:5px 7px;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(36,116,200,.28);}
+    .nav-link{color:#4a6080;font-weight:700;font-size:.9rem;transition:color .2s;text-decoration:none;}
+    .nav-link:hover{color:#2474c8;}
+    .btn-orange{background:linear-gradient(135deg,#e07820,#f59332);color:#fff;font-weight:800;padding:9px 22px;border-radius:10px;font-size:.88rem;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(224,120,32,.3);transition:all .25s;white-space:nowrap;}
+    .btn-orange:hover{transform:translateY(-1px);}
+    .hero{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:32px 16px 48px;}
+    .illus-col{flex:1 1 0%;animation:fadeL .8s ease both;}
+    @keyframes fadeL{from{opacity:0;transform:translateX(-28px);}to{opacity:1;transform:translateX(0);}}
+    .illus-img{width:100%;max-height:460px;object-fit:cover;object-position:bottom center;border-radius:24px;}
+    .card{background:rgba(255,255,255,.92);backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,.65);border-radius:20px;box-shadow:0 20px 60px rgba(90,150,220,.16),0 4px 20px rgba(90,150,220,.10);padding:28px 28px 32px;}
+    .step-bar{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:20px;}
+    .step-dot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;border:2.5px solid #b8d8f0;color:#8ab0cc;background:#f0f8ff;transition:all .3s;flex-shrink:0;}
+    .step-dot.done{background:#38a169;border-color:#38a169;color:#fff;}
+    .step-dot.act{background:linear-gradient(135deg,#2474c8,#3a9de8);border-color:#2474c8;color:#fff;box-shadow:0 4px 12px rgba(36,116,200,.35);}
+    .step-line{flex:1;height:2.5px;background:#d0e8f8;max-width:48px;transition:background .3s;}
+    .step-line.done{background:#38a169;}
+    .field-label{display:block;font-size:.85rem;font-weight:800;color:#3a5070;margin-bottom:5px;}
+    .fi{width:100%;padding:10px 14px;border:1.8px solid #cce0f4;border-radius:10px;background:#f6fbff;color:#2d3f54;font-size:.88rem;outline:none;transition:all .22s;font-family:'Nunito',sans-serif;}
+    .fi:focus{border-color:#4da6e8;background:#fff;box-shadow:0 0 0 3px rgba(77,166,232,.12);}
+    .fi::placeholder{color:#9db8cc;}
+    select.fi{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237aabcd' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;}
+    .sbox{display:none;margin-top:6px;}
+    .sbox.show{display:block;}
+    .btn-blue{background:linear-gradient(135deg,#2474c8,#3a9de8);color:#fff;font-weight:800;font-size:.98rem;padding:13px 20px;border-radius:12px;border:none;cursor:pointer;width:100%;letter-spacing:.02em;box-shadow:0 6px 22px rgba(36,116,200,.32);transition:all .28s;}
+    .btn-blue:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(36,116,200,.42);}
+    .btn-back{background:transparent;border:2px solid #b8d8f0;color:#4a7090;font-weight:700;font-size:.9rem;padding:11px 20px;border-radius:12px;cursor:pointer;transition:all .22s;flex:0 0 auto;}
+    .btn-back:hover{background:#edf6ff;border-color:#7ab8dc;}
+    @keyframes sIn{from{opacity:0;transform:translateX(28px);}to{opacity:1;transform:translateX(0);}}
+    @keyframes sBack{from{opacity:0;transform:translateX(-28px);}to{opacity:1;transform:translateX(0);}}
+    .anim-in{animation:sIn .28s ease both;}
+    .anim-back{animation:sBack .28s ease both;}
+    #mob-menu{max-height:0;opacity:0;overflow:hidden;transition:max-height .35s ease,opacity .3s;}
+    #mob-menu.open{max-height:360px;opacity:1;}
+    .tl-sep{color:#7bb8da;margin:0 12px;}
+    .eca-opt{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;background:#f0f8ff;border:1.5px solid #d0e8f8;cursor:pointer;transition:all .2s;font-size:.84rem;font-weight:700;color:#3a5070;}
+    .eca-opt input{accent-color:#2474c8;width:15px;height:15px;cursor:pointer;}
+    .eca-opt:hover{background:#e2f0fb;border-color:#90c8e8;}
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    @media(max-width:480px){.g2{grid-template-columns:1fr;}}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.4);}}
+    .ldot{width:10px;height:10px;border-radius:50%;background:#d0e8f8;flex-shrink:0;transition:background .3s;}
+    .lstep{display:flex;align-items:center;gap:10px;font-size:.85rem;font-weight:700;color:#8ab0cc;padding:6px 0;transition:color .3s;}
+    .lstep.on{color:#2474c8;}
+    .lstep.on .ldot{background:#2474c8;animation:pulse 1s infinite;}
+    .lstep.done{color:#16a34a;}
+    .lstep.done .ldot{background:#16a34a;}
+    #results-page{display:none;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+    .rcard{background:rgba(255,255,255,.95);border-radius:18px;padding:22px 24px;box-shadow:0 12px 40px rgba(80,140,210,.18);border:1.5px solid rgba(255,255,255,.7);}
+    .bf{background:#dcfce7;color:#16a34a;font-size:.72rem;font-weight:800;padding:3px 9px;border-radius:999px;}
+    .bp{background:#fef9c3;color:#ca8a04;font-size:.72rem;font-weight:800;padding:3px 9px;border-radius:999px;}
+    .br{background:#ede9fe;color:#7c3aed;font-size:.72rem;font-weight:800;padding:3px 9px;border-radius:999px;}
+    .bt{background:#dbeafe;color:#1d4ed8;font-size:.72rem;font-weight:800;padding:3px 9px;border-radius:999px;}
+    .ppill{background:#f0f8ff;border:1.5px solid #d0e8f8;border-radius:10px;padding:6px 12px;font-size:.78rem;color:#4a7090;font-weight:700;}
+    .popup-overlay{position:fixed;inset:0;z-index:100;background:rgba(10,30,60,.45);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px;}
+    .popup-box{background:#fff;border-radius:20px;padding:32px 28px;max-width:380px;width:100%;box-shadow:0 24px 60px rgba(20,60,120,.22);text-align:center;}
+    @keyframes popIn{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:scale(1);}}
+    .nav-popup-overlay{position:fixed;inset:0;z-index:200;background:rgba(10,30,60,.5);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:16px;}
+    .nav-popup-overlay.show{display:flex;animation:popIn .25s ease both;}
+    .nav-popup-box{background:#fff;border-radius:22px;padding:30px 28px 26px;max-width:520px;width:100%;box-shadow:0 28px 70px rgba(20,60,120,.28);position:relative;max-height:82vh;overflow-y:auto;}
+    .nav-popup-box h2{font-size:1.12rem;font-weight:900;color:#1a3050;margin:0 0 14px;line-height:1.4;}
+    .nav-popup-box p{font-size:.87rem;line-height:1.75;color:#4a6080;margin:0 0 10px;}
+    .nav-popup-box ul{margin:8px 0 12px;padding-left:22px;}
+    .nav-popup-box ul li{font-size:.86rem;line-height:1.75;color:#4a6080;margin-bottom:5px;}
+    .nav-popup-box strong{color:#2474c8;}
+    .nav-popup-box .section-title{font-size:.82rem;font-weight:900;color:#2474c8;letter-spacing:.06em;text-transform:uppercase;margin:16px 0 8px;display:block;}
+    .nav-popup-close{position:absolute;top:14px;right:16px;background:transparent;border:none;cursor:pointer;font-size:1.4rem;line-height:1;padding:4px 8px;border-radius:8px;color:#8ab0cc;transition:background .2s;}
+    .nav-popup-close:hover{background:#f0f8ff;color:#2474c8;}
+    .theme-btn{background:transparent;border:2px solid rgba(180,210,240,.7);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;flex-shrink:0;}
+    .theme-btn:hover{background:rgba(36,116,200,.1);}
+    body.dark{color:#c8dff0;}
+    body.dark .bg-full{background:linear-gradient(160deg,#0d1b2e 0%,#112240 40%,#0a1628 70%,#07111f 100%);}
+    body.dark .bg-full::before{background-image:radial-gradient(circle,rgba(50,100,160,0.25) 1.2px,transparent 1.2px);}
+    body.dark .blob{opacity:.15;}
+    body.dark nav{background:rgba(8,20,45,.95);border-bottom-color:rgba(50,100,160,.4);}
+    body.dark .nav-link{color:#7aa8cc;}
+    body.dark .nav-link:hover{color:#63b3ed;}
+    body.dark .card{background:rgba(10,24,55,.88);border-color:rgba(50,100,180,.25);}
+    body.dark .fi{background:#0b1a33;border-color:#1a3356;color:#c0d8f0;}
+    body.dark .fi:focus{border-color:#4da6e8;background:#0a1528;}
+    body.dark .fi::placeholder{color:#3a5a7a;}
+    body.dark select.fi{background-color:#0b1a33;}
+    body.dark .field-label{color:#7aa8cc;}
+    body.dark .step-dot{background:#0b1a33;border-color:#1a3356;color:#3a6080;}
+    body.dark .step-line{background:#1a3356;}
+    body.dark .rcard{background:rgba(8,20,48,.94);border-color:rgba(50,100,180,.25);}
+    body.dark .eca-opt{background:#0b1a33;border-color:#1a3356;color:#7aa8cc;}
+    body.dark .eca-opt:hover{background:#0a1528;}
+    body.dark .btn-back{border-color:#1a3356;color:#5a8aaa;}
+    body.dark .btn-back:hover{background:#0b1a33;}
+    body.dark #mob-menu{background:rgba(6,16,38,.98);border-top-color:#1a3356;}
+    body.dark .nav-popup-box{background:#0d1f3c;}
+    body.dark .nav-popup-box h2{color:#c8dff0;}
+    body.dark .nav-popup-box p,body.dark .nav-popup-box li{color:#8ab0cc;}
+    body.dark .nav-popup-box strong{color:#63b3ed;}
+    body.dark .nav-popup-box .section-title{color:#63b3ed;}
+    body.dark .nav-popup-close{color:#4a7090;}
+    body.dark .nav-popup-close:hover{background:rgba(255,255,255,.06);color:#63b3ed;}
+    body.dark .popup-box{background:#0d1f3c;}
+    body.dark .ppill{background:#0b1a33;border-color:#1a3356;color:#7aa8cc;}
+    body.dark .bf{background:#052e16;color:#4ade80;}
+    body.dark .bp{background:#1c1a00;color:#facc15;}
+    body.dark .br{background:#1e0a3c;color:#c084fc;}
+    body.dark .bt{background:#0c1e3c;color:#60a5fa;}
+    body.dark h1,body.dark h2,body.dark h3,body.dark h4{color:#c8dff0!important;}
+    body.dark p{color:#8ab0cc!important;}
+    body.dark span[style*="color:#1a3050"],body.dark h3[style*="color:#1a3050"]{color:#c8dff0!important;}
+    body.dark span[style*="color:#4a6080"],body.dark div[style*="color:#4a6080"]{color:#8ab0cc!important;}
+    body.dark div[style*="color:#6a8aaa"],body.dark span[style*="color:#6a8aaa"]{color:#5a7a9a!important;}
+    body.dark div[style*="color:#2474c8"],body.dark span[style*="color:#2474c8"]{color:#63b3ed!important;}
+    body.dark div[style*="color:#e07820"],body.dark span[style*="color:#e07820"]{color:#f6ad55!important;}
+    body.dark div[style*="color:#4a7090"],body.dark span[style*="color:#4a7090"]{color:#7aa8cc!important;}
+    body.dark div[style*="color:#8ab0cc"],body.dark span[style*="color:#8ab0cc"]{color:#5a7a9a!important;}
+    body.dark div[style*="color:#16a34a"]{color:#4ade80!important;}
+    body.dark div[style*="color:#1a3050"]{color:#c8dff0!important;}
+    body.dark .rcard h3{color:#c8dff0!important;}
+    body.dark .rcard p{color:#6a90aa!important;}
+    body.dark div[style*="background:#f8fbff"]{background:#0b1a33!important;border-color:#1a3356!important;}
+    body.dark div[style*="color:#4a7090"]{color:#7aa8cc!important;}
+    body.dark div[style*="color:#2d3748"]{color:#c8dff0!important;}
+    body.dark .logo-badge + div span[style*="color:#2d3748"]{color:#c8dff0!important;}
+    body.dark #results-page{background:transparent;}
+    body.dark div[style*="background:rgba(255,255,255"]{background:rgba(10,24,55,.88)!important;}
+    body.dark div[style*="background:#fff"]{background:#0d1f3c!important;}
+    body.dark div[style*="background:#eff8ff"]{background:#0b1a33!important;}
+    body.dark div[style*="color:#3a5070"]{color:#7aa8cc!important;}
+  </style>
+</head>
+<body>
+<div class="bg-full"></div>
+<div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+
+<!-- CACHE POPUP -->
+<div class="popup-overlay" id="cache-popup" style="display:none;">
+  <div class="popup-box" style="animation:popIn .3s ease both;">
+    <div style="width:62px;height:62px;background:#eff8ff;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2474c8" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </div>
+    <h3 style="font-size:1.05rem;font-weight:900;color:#1a3050;margin:0 0 10px;">Previous Data Found!</h3>
+    <p style="color:#6a8aaa;font-size:.88rem;line-height:1.6;margin:0 0 22px;">Use your <strong style="color:#2474c8;">previously entered information?</strong></p>
+    <div style="display:flex;gap:10px;">
+      <button onclick="cacheNo()" style="flex:1;padding:11px;border-radius:10px;border:2px solid #d0e8f8;background:transparent;color:#4a7090;font-weight:800;font-size:.88rem;cursor:pointer;">No, Re-enter</button>
+      <button onclick="cacheYes()" class="btn-blue" style="flex:1;padding:11px;font-size:.88rem;">Yes, Use It!</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div style="max-width:1200px;margin:0 auto;padding:0 16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;height:62px;">
+      <a href="#" onclick="goHome();return false;" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;">
+        <div class="logo-badge">
+          <svg width="26" height="26" viewBox="0 0 48 48" fill="none">
+            <ellipse cx="24" cy="29" rx="15" ry="9" fill="#90cdf4"/>
+            <path d="M9 29Q17 15 30 21Q38 25 39 29Q31 35 16 35Z" fill="#63b3ed"/>
+            <circle cx="18" cy="24" r="2.5" fill="white"/><circle cx="18" cy="24" r="1.2" fill="#2b6cb0"/>
+            <path d="M27 31Q30 29 33 31" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            <rect x="14" y="7" width="20" height="4" rx="1" fill="#2d3748"/>
+            <polygon points="24,3 34,10 14,10" fill="#1a202c"/>
+            <line x1="34" y1="10" x2="36" y2="15" stroke="#f6ad55" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="36" cy="16" r="1.5" fill="#f6ad55"/>
+          </svg>
+        </div>
+        <div style="line-height:1.15;">
+          <span style="color:#2474c8;font-weight:900;font-size:1.05rem;">AI</span><span style="color:#2d3748;font-weight:900;font-size:1.05rem;">Scholarship</span>
+          <br/><span style="color:#e07820;font-weight:900;font-size:1.1rem;">Hunter</span>
+        </div>
+      </a>
+      <div style="display:flex;align-items:center;gap:20px;" class="hidden-mob">
+        <a href="#" class="nav-link" onclick="openNavPopup('about');return false;">About</a>
+        <a href="#" class="nav-link" onclick="openNavPopup('howitworks');return false;">How It Works</a>
+        <a href="#" class="nav-link" onclick="openNavPopup('contact');return false;">Contact</a>
+        <button class="theme-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark/light mode">
+          <svg id="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e07820" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg id="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7aa8cc" stroke-width="2.2" stroke-linecap="round" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="btn-orange" onclick="openNavPopup('manual')">Read the manual</button>
+      </div>
+      <button id="ham-btn" style="display:none;flex-direction:column;gap:5px;padding:8px;border:none;background:transparent;cursor:pointer;border-radius:8px;">
+        <span id="hh1" style="width:24px;height:2.5px;background:#4a6080;border-radius:2px;display:block;transition:all .3s;"></span>
+        <span id="hh2" style="width:24px;height:2.5px;background:#4a6080;border-radius:2px;display:block;transition:all .3s;"></span>
+        <span id="hh3" style="width:24px;height:2.5px;background:#4a6080;border-radius:2px;display:block;transition:all .3s;"></span>
+      </button>
+    </div>
+  </div>
+  <div id="mob-menu" style="background:rgba(255,255,255,.97);border-top:1px solid #d8eef8;padding:0 16px;">
+    <div style="display:flex;flex-direction:column;gap:4px;padding:12px 0 16px;">
+      <a href="#" class="nav-link" style="padding:9px 12px;border-radius:8px;" onclick="openNavPopup('about');return false;">About</a>
+      <a href="#" class="nav-link" style="padding:9px 12px;border-radius:8px;" onclick="openNavPopup('howitworks');return false;">How It Works</a>
+      <a href="#" class="nav-link" style="padding:9px 12px;border-radius:8px;" onclick="openNavPopup('contact');return false;">Contact</a>
+      <button class="btn-orange" style="margin-top:6px;" onclick="openNavPopup('manual')">Read the manual</button>
+    </div>
+  </div>
+</nav>
+
+<!-- FORM PAGE -->
+<div id="form-page">
+  <div class="hero">
+    <div style="text-align:center;margin-bottom:28px;">
+      <h1 style="font-size:clamp(1.6rem,4vw,2.8rem);font-weight:900;color:#1a3050;line-height:1.2;margin:0 0 8px;">Find Your Perfect <span style="color:#2474c8;">Scholarship</span> Opportunities!</h1>
+      <p style="color:#6a8aaa;font-size:clamp(.9rem,2vw,1.05rem);font-weight:600;margin:0;">Tell us about yourself to get started.</p>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start;">
+      <div class="illus-col" style="min-width:280px;">
+        <img src="WhatsApp_Image_2026-03-07_at_11_31_10.jpeg" alt="Student" class="illus-img" onerror="this.parentElement.style.display='none'"/>
+      </div>
+      <div style="flex:1 1 320px;min-width:300px;max-width:520px;margin:0 auto;">
+        <div class="card" id="the-card">
+
+          <!-- STEP BAR (always visible when form is showing) -->
+          <div id="stepbar-wrap">
+            <div class="step-bar">
+              <div class="step-dot act" id="sd1">1</div>
+              <div class="step-line" id="sl1"></div>
+              <div class="step-dot" id="sd2">2</div>
+              <div class="step-line" id="sl2"></div>
+              <div class="step-dot" id="sd3">3</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.72rem;font-weight:700;color:#8ab0cc;margin-bottom:18px;padding:0 2px;">
+              <span>Basic Info</span><span>Academic</span><span>Preferences</span>
+            </div>
+          </div>
+
+          <!-- STEP 1 — visible by default -->
+          <div id="s1wrap">
+            <h2 style="font-size:1.18rem;font-weight:900;color:#1a3050;text-align:center;margin:0 0 18px;">Basic Information</h2>
+            <div style="display:flex;flex-direction:column;gap:13px;">
+              <div>
+                <label class="field-label">Full Name <span style="color:#e07820;">*</span></label>
+                <input type="text" id="s1_name" class="fi" placeholder="Enter your full name"/>
+              </div>
+              <div class="g2">
+                <div>
+                  <label class="field-label">Age <span style="color:#e07820;">*</span></label>
+                  <input type="number" id="s1_age" class="fi" placeholder="e.g. 22" min="10" max="80"/>
+                </div>
+                <div>
+                  <label class="field-label">Gender <span style="color:#e07820;">*</span></label>
+                  <input type="text" id="s1_gender" class="fi" placeholder="Male / Female / Other"/>
+                </div>
+              </div>
+              <div>
+                <label class="field-label">Country of Citizenship <span style="color:#e07820;">*</span></label>
+                <input type="text" id="s1_citizenship" class="fi" placeholder="e.g. Bangladesh"/>
+              </div>
+              <div>
+                <label class="field-label">Country of Residence <span style="color:#e07820;">*</span></label>
+                <input type="text" id="s1_residence" class="fi" placeholder="e.g. Bangladesh"/>
+              </div>
+              <div style="padding-top:4px;">
+                <button class="btn-blue" onclick="goNext(1)">Next &rarr;</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 2 — hidden by default -->
+          <div id="s2wrap" style="display:none;">
+            <h2 style="font-size:1.18rem;font-weight:900;color:#1a3050;text-align:center;margin:0 0 18px;">Academic Information</h2>
+            <div style="display:flex;flex-direction:column;gap:13px;">
+              <div>
+                <label class="field-label">Study Level <span style="color:#e07820;">*</span></label>
+                <select id="s2_level" class="fi">
+                  <option value="" disabled selected>Choose your level</option>
+                  <option>High School</option><option>Diploma</option><option>Bachelor's</option>
+                  <option>Master's</option><option>PhD</option><option>PG Diploma</option>
+                </select>
+              </div>
+              <div>
+                <label class="field-label">Field of Study <span style="color:#e07820;">*</span></label>
+                <input type="text" id="s2_field" class="fi" placeholder="e.g. Computer Science"/>
+              </div>
+              <div class="g2">
+                <div>
+                  <label class="field-label">GPA / CGPA</label>
+                  <input type="text" id="s2_gpa" class="fi" placeholder="e.g. 3.80 / 5.0"/>
+                </div>
+                <div>
+                  <label class="field-label">Current Institution</label>
+                  <input type="text" id="s2_uni" class="fi" placeholder="University / School"/>
+                </div>
+              </div>
+              <div>
+                <label class="field-label">English Proficiency Test</label>
+                <select id="s2_eng" class="fi" onchange="toggleScore('s2_eng','eng_score_box','eng_score_lbl')">
+                  <option value="">None / Not taken</option>
+                  <option value="IELTS">IELTS</option><option value="TOEFL">TOEFL</option><option value="Duolingo">Duolingo</option>
+                </select>
+                <div id="eng_score_box" class="sbox">
+                  <label class="field-label" id="eng_score_lbl" style="margin-top:6px;">Score</label>
+                  <input type="text" id="s2_eng_score" class="fi" placeholder="Enter score"/>
+                </div>
+              </div>
+              <div>
+                <label class="field-label">Standardized Test <span style="color:#9db8cc;font-weight:600;">(optional)</span></label>
+                <select id="s2_std" class="fi" onchange="toggleScore('s2_std','std_score_box','std_score_lbl')">
+                  <option value="">None / Not taken</option>
+                  <option value="SAT">SAT</option><option value="ACT">ACT</option>
+                  <option value="GRE">GRE</option><option value="GMAT">GMAT</option>
+                </select>
+                <div id="std_score_box" class="sbox">
+                  <label class="field-label" id="std_score_lbl" style="margin-top:6px;">Score</label>
+                  <input type="text" id="s2_std_score" class="fi" placeholder="Enter score"/>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;padding-top:4px;">
+                <button class="btn-back" onclick="goBack(2)">&larr; Back</button>
+                <button class="btn-blue" onclick="goNext(2)" style="flex:1;">Next &rarr;</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 3 — hidden by default -->
+          <div id="s3wrap" style="display:none;">
+            <h2 style="font-size:1.18rem;font-weight:900;color:#1a3050;text-align:center;margin:0 0 18px;">Scholarship Preferences</h2>
+            <div style="display:flex;flex-direction:column;gap:13px;">
+              <div class="g2">
+                <div>
+                  <label class="field-label">Preferred Country</label>
+                  <input type="text" id="s3_country" class="fi" placeholder="e.g. Germany"/>
+                </div>
+                <div>
+                  <label class="field-label">Preferred Region</label>
+                  <select id="s3_region" class="fi">
+                    <option value="">Any Region</option>
+                    <option>Asia</option><option>Europe</option><option>Africa</option>
+                    <option>North America</option><option>South America</option>
+                    <option>Middle East</option><option>Oceania</option>
+                  </select>
+                </div>
+              </div>
+              <div class="g2">
+                <div>
+                  <label class="field-label">Preferred Degree</label>
+                  <select id="s3_degree" class="fi">
+                    <option value="">Any Degree</option>
+                    <option>Bachelor's</option><option>Diploma</option><option>Master's</option>
+                    <option>PhD</option><option>PG Diploma</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="field-label">Preferred Field</label>
+                  <input type="text" id="s3_pfield" class="fi" placeholder="e.g. AI, Medicine"/>
+                </div>
+              </div>
+              <div>
+                <label class="field-label">Scholarship Type</label>
+                <select id="s3_type" class="fi">
+                  <option value="">Any Type</option>
+                  <option>Fully Funded</option><option>Partially Funded</option>
+                  <option>Tuition Only</option><option>Research Grants</option><option>Fellowships</option>
+                </select>
+              </div>
+              <div>
+                <label class="field-label">Work Experience <span style="color:#9db8cc;font-weight:600;">(optional)</span></label>
+                <input type="text" id="s3_work" class="fi" placeholder="e.g. 2 years software engineering"/>
+              </div>
+              <div class="g2">
+                <div>
+                  <label class="field-label">Deadline Preference</label>
+                  <select id="s3_deadline" class="fi">
+                    <option value="">Any Deadline</option>
+                    <option>Within 3 months</option><option>3-6 months</option>
+                    <option>6-12 months</option><option>12-24 months</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="field-label">Study Mode</label>
+                  <select id="s3_mode" class="fi">
+                    <option value="">Any Mode</option>
+                    <option>On-campus</option><option>Online</option><option>Hybrid</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="field-label">Extra Curricular Activities</label>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:4px;">
+                  <label class="eca-opt"><input type="checkbox" name="eca" value="Leadership"/> 🏆 Leadership</label>
+                  <label class="eca-opt"><input type="checkbox" name="eca" value="Volunteering"/> 🤝 Volunteering</label>
+                  <label class="eca-opt"><input type="checkbox" name="eca" value="Sports/Arts"/> 🎨 Sports/Arts</label>
+                  <label class="eca-opt"><input type="checkbox" name="eca" value="Research"/> 🔬 Research</label>
+                  <label class="eca-opt"><input type="checkbox" name="eca" value="Olympiads"/> 🥇 Olympiads</label>
+                  <label class="eca-opt"><input type="checkbox" name="eca" value="Debating"/> 🎤 Debating</label>
+                  <label class="eca-opt" style="grid-column:span 2;"><input type="checkbox" name="eca" value="Others"/> ✨ Others</label>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;padding-top:6px;">
+                <button class="btn-back" onclick="goBack(3)">&larr; Back</button>
+                <button class="btn-blue" onclick="handleSubmit()" style="flex:1;">🎓 Find Scholarships</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- LOADER — hidden by default -->
+          <div id="loader-wrap" style="display:none;text-align:center;padding:28px 0 20px;">
+            <div style="width:54px;height:54px;border:4px solid #bee3f8;border-top:4px solid #2474c8;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
+            <p style="color:#2474c8;font-weight:900;font-size:1rem;margin:0 0 4px;">Searching Scholarships...</p>
+            <p style="color:#8ab0cc;font-size:.8rem;font-weight:700;margin:0 0 18px;">Patience is a virtue... especially when AI is hunting scholarships for you 🏆</p>
+            <div style="text-align:left;max-width:280px;margin:0 auto;">
+              <div class="lstep" id="ls1"><div class="ldot"></div> Analyzing your profile</div>
+              <div class="lstep" id="ls2"><div class="ldot"></div> Connecting to AI</div>
+              <div class="lstep" id="ls3"><div class="ldot"></div> Searching the web</div>
+              <div class="lstep" id="ls4"><div class="ldot"></div> Checking eligibility</div>
+              <div class="lstep" id="ls5"><div class="ldot"></div> Calculating match scores</div>
+              <div class="lstep" id="ls6"><div class="ldot"></div> Preparing your results</div>
+            </div>
+            <div id="coffee-msg" style="display:none;margin-top:16px;padding:12px 16px;background:#f0f8ff;border-radius:12px;border:1.5px solid #d0e8f8;max-width:280px;margin-left:auto;margin-right:auto;">
+              <p style="font-size:.82rem;font-weight:800;color:#2474c8;margin:0 0 3px;">☕ Grab a coffee!</p>
+              <p style="font-size:.76rem;font-weight:700;color:#6a8aaa;margin:0;line-height:1.5;">Perplexity AI is scanning the web for the best scholarships for you!</p>
+            </div>
+          </div>
+
+          <!-- ERROR — hidden by default -->
+          <div id="error-wrap" style="display:none;text-align:center;padding:28px 0 20px;">
+            <div style="width:54px;height:54px;background:#fff0f0;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e53e3e" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <p style="color:#e53e3e;font-weight:900;font-size:1rem;margin:0 0 8px;">Search Failed</p>
+            <p id="error-msg" style="color:#6a8aaa;font-size:.85rem;font-weight:700;margin:0 0 20px;line-height:1.5;max-width:280px;margin-left:auto;margin-right:auto;"></p>
+            <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+              <button onclick="retrySearch()" class="btn-blue" style="width:auto;padding:10px 24px;font-size:.88rem;">🔄 Try Again</button>
+              <button onclick="resetToForm()" style="padding:10px 20px;border-radius:10px;border:2px solid #b8d8f0;background:transparent;color:#4a7090;font-weight:800;font-size:.88rem;cursor:pointer;">&larr; Edit Info</button>
+            </div>
+          </div>
+
+        </div><!-- /card -->
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:36px;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px 0;">
+      <span style="color:#2474c8;font-weight:800;font-size:.9rem;">Unlock Global Opportunities</span>
+      <span class="tl-sep">|</span>
+      <span style="color:#2474c8;font-weight:800;font-size:.9rem;">Find Your Best Matches</span>
+      <span class="tl-sep">|</span>
+      <span style="color:#2474c8;font-weight:800;font-size:.9rem;">Achieve Your Dreams</span>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS PAGE -->
+<div id="results-page">
+  <div style="max-width:1100px;margin:0 auto;padding:28px 16px 60px;animation:fadeUp .6s ease both;">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;">
+      <div>
+        <h2 style="font-size:clamp(1.3rem,3vw,1.9rem);font-weight:900;color:#1a3050;margin:0 0 4px;">🎓 Your Scholarship Matches</h2>
+        <p id="res-sub" style="color:#6a8aaa;font-size:.9rem;font-weight:600;margin:0;"></p>
+      </div>
+      <button onclick="goHome()" style="background:transparent;border:2px solid #b8d8f0;color:#4a7090;font-weight:800;padding:9px 18px;border-radius:10px;cursor:pointer;font-size:.88rem;white-space:nowrap;">&larr; New Search</button>
+    </div>
+    <div id="profile-bar" style="background:rgba(255,255,255,.88);border-radius:14px;padding:14px 18px;margin-bottom:22px;border:1.5px solid #e0eefa;display:flex;flex-wrap:wrap;gap:8px;align-items:center;"></div>
+    <div id="res-list" style="display:flex;flex-direction:column;gap:14px;"></div>
+    <div style="text-align:center;margin-top:32px;padding:18px;background:rgba(255,255,255,.7);border-radius:14px;border:1.5px solid #e0eefa;">
+      <button onclick="goHome()" class="btn-blue" style="width:auto;padding:11px 28px;font-size:.88rem;">🔄 Search Again</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<!-- NAV POPUPS -->
+<div class="nav-popup-overlay" id="popup-about" onclick="closeNavPopup('about')">
+  <div class="nav-popup-box" onclick="event.stopPropagation()">
+    <button class="nav-popup-close" onclick="closeNavPopup('about')">&#10005;</button>
+    <h2>About AI Scholarship Hunter</h2>
+    <p>Innovation in progress! Built specifically for Frostbyte, this demo showcases the core potential of my AI Scholarship Hunter. I am committed to further refining every detail to ensure a polished, high-performance, and production-ready solution.</p>
+  </div>
+</div>
+
+<div class="nav-popup-overlay" id="popup-howitworks" onclick="closeNavPopup('howitworks')">
+  <div class="nav-popup-box" onclick="event.stopPropagation()">
+    <button class="nav-popup-close" onclick="closeNavPopup('howitworks')">&#10005;</button>
+    <h2>AI Scholarship Hunter: Bridging the Gap to Global Education</h2>
+    <p>Finding the right scholarship is often the most overwhelming part of a student&#8217;s journey. Deadlines, eligibility criteria, and scattered information make it easy to miss life-changing opportunities. AI Scholarship Hunter was built to solve this&#8212;putting the power of real-time Artificial Intelligence directly into your hands.</p>
+    <span class="section-title">The Technology Stack</span>
+    <p>Built with a privacy-first, client-side approach, this application runs entirely in your browser.</p>
+    <ul>
+      <li><strong>HTML5 &amp; Tailwind CSS:</strong> For a modern, responsive, and &#8220;glass-morphic&#8221; interface that provides a premium user experience.</li>
+      <li><strong>Vanilla JavaScript:</strong> No heavy frameworks&#8212;just pure, high-performance JS handling form logic, API calls, and local caching.</li>
+      <li><strong>OpenRouter &amp; Perplexity Sonar:</strong> The brain of the app. Unlike static AI models, it performs real-time web searches to ensure you get live, up-to-date scholarship data.</li>
+      <li><strong>Privacy-Centric:</strong> No databases, no sign-ups. Your data stays in your browser&#8217;s <code style="background:#f0f8ff;padding:1px 5px;border-radius:4px;font-size:.83rem;">localStorage</code>.</li>
+    </ul>
+    <span class="section-title">Key Features</span>
+    <ul>
+      <li><strong>Personalized Match Scoring:</strong> The AI calculates a percentage score based on your GPA, IELTS, and extracurriculars, even explaining why a scholarship fits you.</li>
+      <li><strong>Live Research Engine:</strong> Goes beyond simple lists. It digs into Reddit, blogs, and forums to find success stories of past recipients from your specific country.</li>
+      <li><strong>Multimedia Integration:</strong> Automatically fetches relevant YouTube guides and vlogs to give you a visual roadmap for your application.</li>
+    </ul>
+    <p>Developed for the Frostbyte Hackathon, this platform is more than just a search tool; it&#8217;s a personal consultant. While this is a functional demo, the roadmap includes even deeper integration with university portals and automated document checklists.</p>
+  </div>
+</div>
+
+<div class="nav-popup-overlay" id="popup-contact" onclick="closeNavPopup('contact')">
+  <div class="nav-popup-box" onclick="event.stopPropagation()">
+    <button class="nav-popup-close" onclick="closeNavPopup('contact')">&#10005;</button>
+    <h2>Muhammad Ishraq Kabir</h2>
+    <p style="margin-bottom:6px;font-weight:800;color:#e07820;">Full-Stack Web &amp; Android Developer</p>
+    <p>I am a 17-year-old developer from Bangladesh with a passion for building scalable and user-centric solutions. Currently focusing on the MERN Stack for web and Native Android Development for mobile, I bridge the gap between complex backend logic and intuitive frontend design.</p>
+    <span class="section-title">Tech Stack</span>
+    <ul>
+      <li><strong>Web:</strong> MongoDB, Express.js, React.js, Node.js (MERN)</li>
+      <li><strong>Mobile:</strong> Android Development (Java / Kotlin / Flutter)</li>
+      <li><strong>Currently:</strong> High School Student &amp; Aspiring Software Engineer</li>
+    </ul>
+    <span class="section-title">Get In Touch</span>
+    <ul>
+      <li><strong>Email:</strong> <a href="mailto:ishraq.kabir.official@gmail.com" style="color:#2474c8;text-decoration:none;">ishraq.kabir.official@gmail.com</a></li>
+      <li><strong>WhatsApp:</strong> <a href="https://wa.me/8801886784393" target="_blank" style="color:#2474c8;text-decoration:none;">+880 1886-784393</a></li>
+      <li><strong>Location:</strong> Bangladesh</li>
+    </ul>
+  </div>
+</div>
+
+<div class="nav-popup-overlay" id="popup-manual" onclick="closeNavPopup('manual')">
+  <div class="nav-popup-box" onclick="event.stopPropagation()">
+    <button class="nav-popup-close" onclick="closeNavPopup('manual')">&#10005;</button>
+    <h2>Welcome to AI Scholarship Hunter</h2>
+    <p>Finding the right scholarship is one of the most overwhelming challenges a student can face. AI Scholarship Hunter puts the power of real-time AI directly into your hands.</p>
+    <span class="section-title">Step 1 &#8212; Tell Us About You</span>
+    <p>Fill in the 3-step form with your academic background, citizenship, English scores, and preferences. Every field you fill in makes your results more accurate.</p>
+    <span class="section-title">Step 2 &#8212; AI Searches in Real Time</span>
+    <p>Once you submit, Perplexity Sonar&#8212;a live web-search AI&#8212;scans the internet and returns 8 scholarships ranked by match score, tailored to your exact profile.</p>
+    <span class="section-title">Step 3 &#8212; Review Your Results</span>
+    <p>Each result card shows the scholarship name, country, funding type, amount, deadline, and the reasons it matches you. Click <strong>Apply Now</strong> to visit the official page.</p>
+    <span class="section-title">Step 4 &#8212; Deep Research</span>
+    <p>Click <strong>Deep Research</strong> on any card to open a full analysis in a new tab&#8212;covering requirements, documents, pros &amp; cons, past recipient stories, and YouTube guides.</p>
+  </div>
+</div>
+
+</body>
+</html>
