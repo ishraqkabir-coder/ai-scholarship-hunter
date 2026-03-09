@@ -6,16 +6,16 @@ Real-time AI-powered scholarship finder — built for the Frostbyte Hackathon
 [aischolarshiphunter.netlify.app](https://aischolarshiphunter.netlify.app)
 
 ## Features
-- 🔍 Real-time scholarship search via Perplexity Sonar AI
-- 🎯 Personalized match scoring based on your profile
-- 🔬 Deep Research — requirements, documents, past recipients, YouTube guides
-- 🌙 Dark / Light mode
-- 📄 PDF export of Deep Research results
-- 🔒 Privacy-first — no database, no login, data stays in your browser
+-  Real-time scholarship search via Perplexity Sonar AI
+-  Personalized match scoring based on your profile
+-  Deep Research — requirements, documents, past recipients, YouTube guides
+-  Dark / Light mode
+-  PDF export of Deep Research results
+-  Privacy-first — no database, no login, data stays in your browser
 
 ## Tech Stack
 - **Frontend:** HTML5, Tailwind CSS, Vanilla JavaScript
-- **AI:** OpenRouter + Perplexity Sonar (real-time web search)
+- **AI:** tavily + together Ai (Llama 3.3 70B) (real-time web search)
 - **Backend:** Netlify Serverless Functions (API key protection)
 - **Hosting:** Netlify
 
