@@ -72,7 +72,7 @@ exports.handler = async function(event) {
         'X-Title': 'AI Scholarship Hunter'
       },
       {
-        model: 'google/gemma-3-27b-it:free',
+        model: 'model: 'openrouter/auto',
         messages: [{ role: 'user', content: fullPrompt }],
         temperature: 0.5,
         max_tokens: 5000
